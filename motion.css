@@ -29,5 +29,10 @@ html{background:var(--bg)}
 html[data-page-transition='enter'] .page-curtain{transition:none}
 main,.header,.footer{transition:opacity .5s var(--ease)}
 .page-leaving main,.page-leaving .header,.page-leaving .footer{opacity:.55}
+.developer-credit{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;padding:4px 8px;border:1px solid rgba(240,238,229,.12);border-radius:999px;background:rgba(240,238,229,.025);font-size:9px;line-height:1.4;color:var(--muted);white-space:nowrap;transition:color .3s var(--ease),border-color .3s var(--ease),background .3s var(--ease)}
+.developer-credit strong{font-weight:500;color:var(--ink)}
+.developer-credit:hover,.developer-credit:focus-visible{color:var(--ink);border-color:rgba(213,175,136,.4);background:rgba(213,175,136,.06)}
+.footer>a[href*="instagram.com"]:hover{color:var(--accent)}
+@media(max-width:760px){.developer-credit{grid-column:1/-1;justify-self:end;font-size:9px}.footer>span:nth-of-type(2){text-align:right}}
 @media(max-width:760px){.js .reveal{translate:0 25px}.js .service-card.reveal{translate:0 35px;--reveal-delay:0s!important}.process-card{--reveal-delay:0s!important}.hero-copy h1 em{display:inline-block;font-size:1.12em;line-height:1.05}.line-mask{padding-bottom:.19em;margin-bottom:-.19em}.pause-section{--pause-inset:2%;--pause-radius:24px}}
 @media(prefers-reduced-motion:reduce){.js .reveal,.js .scroll-reveal .line-inner{opacity:1;translate:none;transform:none;transition:none}.pause-section{clip-path:none;will-change:auto}.hero-copy,.hero-aside{opacity:1}.page-curtain{display:none}.photo-frame img{scale:1}.scroll-progress{display:none}.page-leaving main,.page-leaving .header,.page-leaving .footer{opacity:1}}

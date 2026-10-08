@@ -1,0 +1,31 @@
+'use strict';
+document.documentElement.classList.add('js');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const menuToggle = document.querySelector('.menu-toggle');
+const mobileNav = document.getElementById('mobile-nav');
+menuToggle?.addEventListener('click', () => { const open = menuToggle.getAttribute('aria-expanded') !== 'true'; menuToggle.setAttribute('aria-expanded', String(open)); menuToggle.setAttribute('aria-label', open ? 'Закрити меню' : 'Відкрити меню'); mobileNav.hidden = !open; });
+mobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { mobileNav.hidden = true; menuToggle.setAttribute('aria-expanded','false'); menuToggle.setAttribute('aria-label','Відкрити меню'); }));
+document.addEventListener('keydown', e => { if(e.key==='Escape' && mobileNav && !mobileNav.hidden){ mobileNav.hidden=true;menuToggle.setAttribute('aria-expanded','false');menuToggle.setAttribute('aria-label','Відкрити меню');menuToggle.focus(); } });
+document.querySelectorAll('.year').forEach(el => el.textContent = String(new Date().getFullYear()));
+if ('IntersectionObserver' in window) { const observer = new IntersectionObserver(entries => { entries.forEach(entry => { if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);} }); }, {threshold:.08}); document.querySelectorAll('.reveal').forEach(el=>observer.observe(el)); } else document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
+const curtain = document.querySelector('.page-curtain');
+document.querySelectorAll('a[href]').forEach(link => { link.addEventListener('click',e => { if(e.defaultPrevented || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button!==0 || link.target==='_blank' || reducedMotion.matches) return; const destination = new URL(link.href); if(destination.origin!==location.origin || destination.pathname===location.pathname || !destination.pathname.endsWith('.html')) return; e.preventDefault(); curtain.classList.add('active'); window.setTimeout(()=>location.assign(destination.href),500); }); });
+window.addEventListener('pageshow',()=>curtain?.classList.remove('active'));
+const treatments = {back:{tag:'СПИНА / ШИЯ',title:'Розправити плечі',description:'Довгий день за комп’ютером часто відчувається в плечах та між лопатками. Розкажіть про свої відчуття — під час запису обговоримо масаж спини й шиї та ділянки, яким потрібна увага.'},lower:{tag:'ПОПЕРЕК / УВАГА ДО ТІЛА',title:'Почути своє тіло',description:'Якщо напруження відчувається в попереку, почнімо з розмови про ваш запит. Узгодимо, яким ділянкам приділити увагу, і підберемо відповідний формат сеансу.'},personal:{tag:'ІНДИВІДУАЛЬНИЙ СЕАНС',title:'Побути для себе',description:'Не обов’язково знати назву масажу. Розкажіть, як почуваєтеся і чого очікуєте від візиту. У Massage Zone масаж підбирають під індивідуальний запит.'}};
+const dialog=document.getElementById('service-dialog');
+if(dialog){ dialog.setAttribute('aria-labelledby','dialog-title');dialog.setAttribute('aria-describedby','dialog-description');document.querySelectorAll('[data-service]').forEach(button=>button.addEventListener('click',()=>{const data=treatments[button.dataset.service];document.getElementById('dialog-tag').textContent=data.tag;document.getElementById('dialog-title').textContent=data.title;document.getElementById('dialog-description').textContent=data.description;dialog.showModal();document.body.classList.add('dialog-open');}));dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>document.body.classList.remove('dialog-open'));dialog.addEventListener('click',event=>{if(event.target===dialog){const box=dialog.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dialog.close();}}); }
+const depthLayers = [...document.querySelectorAll('[data-depth]')];
+const cursor = document.querySelector('.cursor');
+let mouseX = innerWidth/2, mouseY=innerHeight/2, cursorX=mouseX, cursorY=mouseY, scrollPosition=window.scrollY;
+const finePointer=window.matchMedia('(hover: hover) and (pointer: fine)');
+let cursorVisible=false;
+window.addEventListener('pointermove',event=>{if(event.pointerType==='touch')return;mouseX=event.clientX;mouseY=event.clientY;cursorVisible=true;if(finePointer.matches&&!reducedMotion.matches)document.body.classList.add('custom-cursor');cursor?.classList.remove('hidden');}, {passive:true});
+document.addEventListener('pointerover',event=>cursor?.classList.toggle('hover',!!event.target.closest('a,button,summary,canvas')));
+document.addEventListener('pointerleave',()=>cursor?.classList.add('hidden'));
+window.addEventListener('blur',()=>cursor?.classList.add('hidden'));
+let ticking=false;
+function renderLayers(){ticking=false;if(reducedMotion.matches)return;scrollPosition=window.scrollY;depthLayers.forEach(layer=>{const speed=Number(layer.dataset.depth);const section=layer.closest('section');const sectionTop=section?.offsetTop||0;const displacement=Math.max(-innerHeight,Math.min(innerHeight,scrollPosition-sectionTop));layer.style.transform=`translate3d(0,${(displacement*speed).toFixed(2)}px,0)`;});}
+window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(renderLayers);ticking=true;}},{passive:true});
+function cursorFrame(){if(cursorVisible && finePointer.matches && !reducedMotion.matches && cursor){cursorX+=(mouseX-cursorX)*.12;cursorY+=(mouseY-cursorY)*.12;const half=cursor.classList.contains('hover')?29:18;cursor.style.transform=`translate3d(${cursorX-half}px,${cursorY-half}px,0)`;}requestAnimationFrame(cursorFrame);}if(finePointer.matches&&!reducedMotion.matches)requestAnimationFrame(cursorFrame);
+reducedMotion.addEventListener('change',()=>{if(reducedMotion.matches){document.body.classList.remove('custom-cursor');depthLayers.forEach(layer=>layer.style.transform='');}else{renderLayers();requestAnimationFrame(cursorFrame);}});
+renderLayers();
